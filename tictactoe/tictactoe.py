@@ -94,20 +94,24 @@ def utility(board):
     else:
         return 0
 
-def min_value(board):
+def min_value(board, pre_min):
     v = 2
     if terminal(board):
         return utility(board)
     for action in actions(board):
-        v = min(v, max_value(result(board, action)))
+        v = min(v, max_value(result(board, action), v))
+        if v < pre_min:
+            return v
     return v
 
-def max_value(board):
+def max_value(board, pre_max):
     v = -2
     if terminal(board):
         return utility(board)
     for action in actions(board):
-        v = max(v, min_value(result(board, action)))
+        v = max(v, min_value(result(board, action), v))
+        if v > pre_max:
+            return v
     return v
 
 def minimax(board):
@@ -116,19 +120,19 @@ def minimax(board):
     """
     optimal_action = None
     all_actions = actions(board)
-    if player(board) == X:
-        highest_value = -2
+    if player(board) == X: # maximize the value
+        v = -2
         for action in all_actions:
-            min = min_value(result(board, action))
-            if  min > highest_value:
-                highest_value  = min
+            min = min_value(result(board, action), v)
+            if  min > v:
+                v = min
                 optimal_action = action
-    else:
-        lowest_value = 2
+    else: # O tries to minimize the value
+        v = 2
         for action in all_actions:
-            max = max_value(result(board, action))
-            if max < lowest_value:
-                lowest_value  = max
+            max = max_value(result(board, action), v)
+            if max < v:
+                v = max
                 optimal_action = action
     return optimal_action
 
